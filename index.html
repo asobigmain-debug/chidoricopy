@@ -235,7 +235,7 @@ body {
   background: none; border: none; cursor: pointer; padding: 0;
   font-family: 'Zen Kaku Gothic New', sans-serif;
 }
-.cell-copy { display: flex; justify-content: center; padding-top: 1px; }
+.cell-copy { display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 1px; }
 .copy-btn {
   padding: 5px 0; background: var(--shu); color: white;
   border: none; border-radius: 4px; cursor: pointer;
@@ -245,6 +245,15 @@ body {
 }
 .copy-btn:active { background: var(--shu-dark); }
 .copy-btn.copied { background: var(--gold); }
+.link-btn {
+  padding: 5px 0; background: white; color: var(--shu);
+  border: 1.5px solid var(--shu); border-radius: 4px; cursor: pointer;
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: 11px; font-weight: 500;
+  width: 64px; text-align: center;
+  text-decoration: none; display: block;
+}
+.link-btn:active { background: var(--shu-pale); }
 .cell-actions {
   display: flex; flex-direction: column; gap: 3px;
   align-items: center; padding-top: 1px;
@@ -614,13 +623,22 @@ function createRow(item, showTab) {
     cc.appendChild(eb);
   }
 
-  // コピー
+  // コピー＋リンク
   const cp = document.createElement('div'); cp.className = 'cell-copy';
   if (hasContent) {
     const cb = document.createElement('button'); cb.className = 'copy-btn'; cb.id = `cp-${item.id}`;
     cb.textContent = 'コピー';
     cb.onclick = () => doCopy(item.id, item.content);
     cp.appendChild(cb);
+    // URLならリンクボタンも追加
+    if (isUrl(item.content)) {
+      const lb = document.createElement('a');
+      lb.className = 'link-btn';
+      lb.href = item.content.trim();
+      lb.target = '_blank'; lb.rel = 'noopener noreferrer';
+      lb.textContent = '開く';
+      cp.appendChild(lb);
+    }
   }
 
   // 操作
@@ -801,6 +819,10 @@ function showToast(msg) {
 // ===== ユーティリティ =====
 function autoResize(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
 function escH(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function isUrl(s) {
+  const t = (s || '').trim();
+  return /^https?:\/\/.+/i.test(t);
+}
 </script>
 </body>
 </html>
